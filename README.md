@@ -1,8 +1,9 @@
-# serverStatusBot
-A Telegram Bot to interact with servers without explicit ssh
+# sasuma :older_woman:
+A Telegram Bot to interact with servers without ssh
 
 ## Setting it up
-` bash setup.sh` ..that's it!
+* ` bash setup.sh` 
+* ` python ssb.py ` (short for <i>sasu</i> bot)
 
 ## Supported commands
 * /cd <directory to cd into>
