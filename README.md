@@ -1,6 +1,8 @@
 # serverStatusBot
 A Telegram Bot to interact with servers without explicit ssh
 
+## Setting it up
+` bash setup.sh` ..that's it!
 
 ## Supported commands
 * /cd <directory to cd into>

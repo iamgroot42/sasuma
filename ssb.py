@@ -1,14 +1,16 @@
 import subprocess
 import os
 import uuid
+import getpass
+
 
 from subprocess import check_output
 from telegram import Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Token for bot 
-token = "BASHTOKENFORTELEGRAM"
-allowed_user = "ALLOWEDUSER"
+token = getpass.getpass("Enter API token for bot: ")
+allowed_user = raw_input("Enter allowed user for bot: ")
 
 bot = Bot(token=token)
 updater = Updater(token=token)
@@ -46,7 +48,8 @@ def quick_command(bot, update):
 		bot.send_message(chat_id=update.message.chat_id, text=output)
 
 
-def long_command(bot, update, job_queue):
+def long_command(bot, update):
+	global updater
 	if (update.message.from_user.username != allowed_user):
 		bot.send_message(chat_id=update.message.chat_id, text="Sorry, but you can't control this server!")
 		return
@@ -56,13 +59,13 @@ def long_command(bot, update, job_queue):
 	wrapper = "screen -dmS %s sh -c '%s >> %s' " % (screen_name, command, unique_filename)
 	p = subprocess.Popen([wrapper], shell=True, stdout=subprocess.PIPE)
 	output, error = p.communicate()
-	bot.send_message(chat_id=update.message.chat_id, text="Job started!")
 	context_obj = {
 		'userid': update.message.chat_id,
 		'screename': screen_name,
 		'filename': unique_filename
 	}
-	job = job_queue.run_repeating(callback_screencheck, context=context_obj, interval=5, first=0)
+	job = updater.job_queue.run_repeating(callback_screencheck, context=context_obj, interval=5, first=0)
+	bot.send_message(chat_id=update.message.chat_id, text="Job started! Output will written to %s!" %(unique_filename))
 	running_jobs[screename] = job
 
 
@@ -74,15 +77,15 @@ def callback_screencheck(bot, job):
 
 
 if __name__ == "__main__":
-	# Map handlers
-	navigate_handler = CommandHandler('cd', navigate_command)
-	quick_handler = CommandHandler('quick', quick_command)
-	long_handler = CommandHandler('long', long_command, pass_job_queue=True)
 	# unknown_handler = MessageHandler(Filters.command, unknown)
+
 	# Add handlers to dispatcher
-	updater.dispatcher.add_handler(navigate_handler)
-	updater.dispatcher.add_handler(quick_handler)
-	updater.dispatcher.add_handler(long_handler)
+	dp = updater.dispatcher
+	dp.add_handler(CommandHandler('cd', navigate_command))
+	dp.add_handler(CommandHandler('quick', quick_command))
+	dp.add_handler(CommandHandler('long', long_command))
+
 	# Start polling Telegram
+	print("Sasu maa is up!")
 	updater.start_polling()
 	updater.idle()
