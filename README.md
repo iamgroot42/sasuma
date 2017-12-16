@@ -2,7 +2,7 @@
 A Telegram Bot to interact with servers without ssh
 
 ## Setting it up
-* ` pip install --user python-telegram-bot --upgrade` 
+* ` pip install --user python-telegram-bot==8.1.1` 
 * ` python ssb.py ` (short for <i>sasu</i> bot)
 
 ## Supported commands
